@@ -1,13 +1,11 @@
-#!/usr/bin/env node
-
 import app from "../app.js";
-import httpModule from "http";
+// import httpModule from "http";
 // import { Server } from "socket.io";
 
 const port = 3000;
 app.set("port", port);
 
-const server = httpModule.createServer(app);
+// const server = httpModule.createServer(app);
 // const io = new Server(server);
 
 // io.on("connection", (socket) => {
@@ -18,4 +16,5 @@ const server = httpModule.createServer(app);
 //   });
 // });
 
-server.listen(port);
+app.listen(port);
+console.log(`Server listen on port ${port}`);

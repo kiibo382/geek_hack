@@ -9,14 +9,8 @@ const staffSchema = new Schema({
         unique: true,
         required: true,
     },
-    firstName: {
-        type: String,
-        required: true,
-    },
-    lastName: {
-        type: String,
-        required: true,
-    },
+    firstName: String,
+    lastName: String,
     email: {
         type: String,
         unique: true,

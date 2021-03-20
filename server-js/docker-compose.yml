@@ -2,10 +2,10 @@ version: "3.9"
 services:
   node:
     build:
-      context: ./build
-      dockerfile: ./Dockerfile
-    volumes:
-      - ./node_modules:/node_modules
+      context: ./
+      dockerfile: Dockerfile
+    restart: always
+    tty: true
     env_file:
       - .env
     ports:
@@ -16,6 +16,7 @@ services:
     image: mongo:4.4.2
     container_name: mongo
     restart: always
+    tty: true
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: rootpass
@@ -28,6 +29,7 @@ services:
     image: redis:6.2.1
     container_name: redis
     restart: always
+    tty: true
     ports:
       - 6379:6379
     volumes:

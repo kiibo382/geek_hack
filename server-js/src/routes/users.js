@@ -32,7 +32,11 @@ router.get("/", [
   getUserList,
 ]);
 
-router.post("/login", [hasAuthValidFields, isPasswordAndUserMatch, login]);
+router.post("/login", [
+  hasAuthValidFields,
+  isPasswordAndUserMatch,
+  login
+]);
 
 router.post("/logout", [
   validJWTNeeded,

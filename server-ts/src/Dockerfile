@@ -1,13 +1,35 @@
-FROM node:14.4.0-alpine
+# Build Layer
+FROM node:14-slim as build
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY ../package*.json ./
+COPY package.json package-lock.json ./
 
-RUN npm install
+RUN npm ci
 
-COPY ../ .
+COPY . .
 
-EXPOSE 3000
+RUN npm run build
 
-CMD [ "npm", "run", "start-dev" ]
+
+# Package install Layer
+FROM node:14-slim as node_modules
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+
+RUN npm ci --only=production
+
+
+# Run Layer
+FROM gcr.io/distroless/nodejs:14
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+COPY --from=build /app/dist /app/dist
+COPY --from=node_modules /app/node_modules /app/node_modules
+
+CMD ["dist/main"]
