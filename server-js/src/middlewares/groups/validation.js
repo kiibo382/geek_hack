@@ -1,12 +1,17 @@
-import { getMemberIds } from "../../models/groups.js"
-import { findByUserName } from "../../models/users.js"
+import Users from "../../models/users.js"
+import Groups from "../../models/groups.js"
+import Staff from "../../models/staff.js"
 
-export function alreadyGroupMember(req, res, next) {
-    findByUserName(req.jwt.userName)
-        .then((user) => {
-            getMemberIds(req.params.groupName)
-                .then((result) => {
-                    if (result.members.includes(user._id)) {
+export function isAlreadyStaff(req, res, next) {
+    Staff
+        .findOne({ "staffName": req.jwt.staffName })
+        .exec(function (err, staff) {
+            if (err) res.status(500).send(err);
+            Groups
+                .findOne({ "groupName": req.params.groupName })
+                .exec(function (err, group) {
+                    if (err) res.status(500).send(err);
+                    if (group.staff.includes(staff._id)) {
                         return res
                             .status(403)
                             .send({ errors: "You are already group member." });
@@ -14,11 +19,25 @@ export function alreadyGroupMember(req, res, next) {
                         next()
                     }
                 })
-                .catch((e) => {
-                    res.status(500).send(e)
-                })
         })
-        .catch((e) => {
-            res.status(500).send(e)
+}
+
+export function isAlreadyAmbassador(req, res, next) {
+    Users
+        .findOne({ "userName": req.jwt.userName })
+        .exec(function (err, user) {
+            if (err) res.status(500).send(err);
+            Groups
+                .findOne({ "groupName": req.params.groupName })
+                .exec(function (err, group) {
+                    if (err) res.status(500).send(err);
+                    if (group.staff.includes(user._id)) {
+                        return res
+                            .status(403)
+                            .send({ errors: "You are already group ambassador." });
+                    } else {
+                        next()
+                    }
+                })
         })
 }

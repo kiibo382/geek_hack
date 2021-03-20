@@ -1,4 +1,5 @@
-import { findByEmail } from "../../models/users.js";
+import Users from "../../models/users.js";
+import Staff from "../../models/staff.js";
 import crypto from "crypto";
 
 export function hasAuthValidFields(req, res, next) {
@@ -25,30 +26,65 @@ export function hasAuthValidFields(req, res, next) {
 }
 
 export function isPasswordAndUserMatch(req, res, next) {
-  findByEmail(req.body.email).then((user) => {
-    if (!user[0]) {
-      res.status(404).send({});
-    } else {
-      const passwordFields = user[0].password.split("$");
-      const salt = passwordFields[0];
-      const hash = crypto
-        .createHmac("sha512", salt)
-        .update(req.body.password)
-        .digest("base64");
-      if (hash === passwordFields[1]) {
-        req.body = {
-          userId: user[0]._id,
-          userName: user[0].userName,
-          email: user[0].email,
-          permissionLevel: user[0].permissionLevel,
-          provider: "email",
-          firstName: user[0].firstName,
-          lastName: user[0].lastName,
-        };
-        return next();
+  Users
+    .findOne({ "userName": req.jwt.userName })
+    .exec(function (err, user) {
+      if (err) res.status(500).send(err);
+      if (!user) {
+        res.status(404).send({});
       } else {
-        return res.status(400).send({ errors: ["Invalid e-mail or password"] });
+        const passwordFields = user.password.split("$");
+        const salt = passwordFields[0];
+        const hash = crypto
+          .createHmac("sha512", salt)
+          .update(req.body.password)
+          .digest("base64");
+        if (hash === passwordFields[1]) {
+          req.body = {
+            userId: user._id,
+            userName: user.userName,
+            email: user.email,
+            permissionLevel: user.permissionLevel,
+            provider: "email",
+            firstName: user.firstName,
+            lastName: user.lastName,
+          };
+          return next();
+        } else {
+          return res.status(400).send({ errors: ["Invalid e-mail or password"] });
+        }
       }
-    }
-  });
+    })
+}
+
+export function isPasswordAndStaffMatch(req, res, next) {
+  Staff
+    .findOne({ "staffName": req.jwt.staffName })
+    .exec(function (err, staff) {
+      if (err) res.status(500).send(err);
+      if (!staff) {
+        res.status(404).send({});
+      } else {
+        const passwordFields = staff.password.split("$");
+        const salt = passwordFields[0];
+        const hash = crypto
+          .createHmac("sha512", salt)
+          .update(req.body.password)
+          .digest("base64");
+        if (hash === passwordFields[1]) {
+          req.body = {
+            userId: staff._id,
+            userName: staff.userName,
+            email: staff.email,
+            permissionLevel: staff.permissionLevel,
+            provider: "email",
+            firstName: staff.firstName,
+            lastName: staff.lastName,
+          };
+          return next();
+        } else {
+          return res.status(400).send({ errors: ["Invalid e-mail or password"] });
+        }
+      }
+    })
 }

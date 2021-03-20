@@ -4,17 +4,25 @@ import {
     getByGroupName,
     putByGroupName,
     removeByGroupName,
-    getMembersByGroupName,
-    addMemberByGroupName,
-    removeMemberByGroupName,
-    getApplicantsByGroupName,
-    addApplicantByGroupName,
-    removeApplicantByGroupName
+    getStaffByGroupName,
+    addStaffByGroupName,
+    removeStaffByGroupName,
+    getStaffApplicantByGroupName,
+    addStaffApplicantByGroupName,
+    removeStaffApplicantByGroupName,
+    getAmbassadorByGroupName,
+    addAmbassadorByGroupName,
+    removeAmbassadorByGroupName,
+    getAmbassadorApplicantByGroupName,
+    addAmbassadorApplicantByGroupName,
+    removeAmbassadorApplicantByGroupName,
 } from "../controllers/groups.js";
-import { isGroupMember } from "../middlewares/groups/verify.js"
-import { alreadyGroupMember } from "../middlewares/groups/validation.js"
+import { isStaff, isAmbassador } from "../middlewares/groups/verify.js"
+import { isAlreadyStaff, isAlreadyAmbassador } from "../middlewares/groups/validation.js"
 import { minimumPermissionLevelRequired } from "../middlewares/users/permission.js";
 import { validJWTNeeded } from "../middlewares/users/validation.js";
+import { staffMinimumPermissionLevelRequired } from "../middlewares/staff/permission.js";
+import { staffValidJWTNeeded } from "../middlewares/staff/validation.js";
 import envConfig from "../config/env.config.js";
 const userPermissionLevels = envConfig.permissionLevels;
 
@@ -26,8 +34,8 @@ import express from "express";
 const router = express.Router();
 
 router.post("/", [
-    validJWTNeeded,
-    minimumPermissionLevelRequired(FREE),
+    staffValidJWTNeeded,
+    staffMinimumPermissionLevelRequired(FREE),
     registerGroup,
 ]);
 
@@ -38,65 +46,109 @@ router.get("/", [
 ]);
 
 router.get("/:groupName", [
-    validJWTNeeded,
-    minimumPermissionLevelRequired(FREE),
+    staffValidJWTNeeded,
+    staffMinimumPermissionLevelRequired(FREE),
+    isStaff,
     getByGroupName,
 ]);
 
 router.put("/:groupName", [
-    validJWTNeeded,
-    minimumPermissionLevelRequired(FREE),
-    isGroupMember,
+    staffValidJWTNeeded,
+    staffMinimumPermissionLevelRequired(FREE),
+    isStaff,
     putByGroupName,
 ]);
 
 router.delete("/:groupName", [
-    validJWTNeeded,
-    minimumPermissionLevelRequired(FREE),
-    isGroupMember,
+    staffValidJWTNeeded,
+    staffMinimumPermissionLevelRequired(FREE),
+    isStaff,
     removeByGroupName,
 ]);
 
-router.get("/:groupName/members", [
-    validJWTNeeded,
-    minimumPermissionLevelRequired(FREE),
-    getMembersByGroupName,
+router.get("/:groupName/staff", [
+    staffValidJWTNeeded,
+    staffMinimumPermissionLevelRequired(FREE),
+    isStaff,
+    getStaffByGroupName,
 ]);
 
-router.post("/:groupName/members", [
-    validJWTNeeded,
-    minimumPermissionLevelRequired(FREE),
-    alreadyGroupMember,
-    addMemberByGroupName,
-    removeApplicantByGroupName
+router.post("/:groupName/staff", [
+    staffValidJWTNeeded,
+    staffMinimumPermissionLevelRequired(FREE),
+    isAlreadyStaff,
+    addStaffByGroupName,
+    removeStaffApplicantByGroupName
 ]);
 
-router.delete("/:groupName/members", [
-    validJWTNeeded,
-    minimumPermissionLevelRequired(FREE),
-    isGroupMember,
-    removeMemberByGroupName
+router.delete("/:groupName/staff", [
+    staffValidJWTNeeded,
+    staffMinimumPermissionLevelRequired(FREE),
+    isStaff,
+    removeStaffByGroupName
 ]);
 
-router.post("/:groupName/applicants", [
-    validJWTNeeded,
-    minimumPermissionLevelRequired(FREE),
-    alreadyGroupMember,
-    addApplicantByGroupName
+router.get("/:groupName/staffApplicant", [
+    staffValidJWTNeeded,
+    staffMinimumPermissionLevelRequired(FREE),
+    getStaffApplicantByGroupName,
 ]);
 
-router.get("/:groupName/applicants", [
-    validJWTNeeded,
-    minimumPermissionLevelRequired(FREE),
-    isGroupMember,
-    getApplicantsByGroupName
+router.post("/:groupName/staffApplicant", [
+    staffValidJWTNeeded,
+    staffMinimumPermissionLevelRequired(FREE),
+    isAlreadyStaff,
+    addStaffApplicantByGroupName,
+    removeStaffApplicantByGroupName
 ]);
 
-router.delete("/:groupName/applicants", [
-    validJWTNeeded,
+router.delete("/:groupName/staffApplicant", [
+    staffValidJWTNeeded,
+    staffMinimumPermissionLevelRequired(FREE),
+    isStaff,
+    removeStaffApplicantByGroupName
+]);
+
+router.post("/:groupName/ambassador", [
+    staffValidJWTNeeded,
     minimumPermissionLevelRequired(FREE),
-    isGroupMember,
-    removeApplicantByGroupName
+    isStaff,
+    addAmbassadorByGroupName
+]);
+
+router.get("/:groupName/ambassador", [
+    staffValidJWTNeeded,
+    staffMinimumPermissionLevelRequired(FREE),
+    isStaff,
+    getAmbassadorByGroupName
+]);
+
+router.delete("/:groupName/ambassador", [
+    staffValidJWTNeeded,
+    staffMinimumPermissionLevelRequired(FREE),
+    isStaff,
+    removeAmbassadorByGroupName
+]);
+
+router.post("/:groupName/ambassadorApplicant", [
+    staffValidJWTNeeded,
+    minimumPermissionLevelRequired(FREE),
+    isAlreadyAmbassador,
+    addAmbassadorApplicantByGroupName
+]);
+
+router.get("/:groupName/ambassadorApplicant", [
+    staffValidJWTNeeded,
+    staffMinimumPermissionLevelRequired(FREE),
+    isStaff,
+    getAmbassadorApplicantByGroupName
+]);
+
+router.delete("/:groupName/ambassadorApplicant", [
+    staffValidJWTNeeded,
+    staffMinimumPermissionLevelRequired(FREE),
+    isStaff,
+    removeAmbassadorApplicantByGroupName
 ]);
 
 export default router;

@@ -1,10 +1,10 @@
-import Users from "../models/users.js";
+import Staff from "../models/staff.js";
 import envConfig from "../config/env.config.js";
-const secret = envConfig.jwt_secret;
+const staffSecret = envConfig.jwt_staff_secret;
 import jsonwebtoken from "jsonwebtoken";
 import crypto from "crypto";
 
-export function insertUser(req, res) {
+export function insertStaff(req, res) {
   const salt = crypto.randomBytes(16).toString("base64");
   const hash = crypto
     .createHmac("sha512", salt)
@@ -12,14 +12,14 @@ export function insertUser(req, res) {
     .digest("base64");
   req.body.password = salt + "$" + hash;
   req.body.permissionLevel = 1;
-  const user = new Users(req.body);
-  user.save(function (err) {
+  const staff = new Staff(req.body);
+  staff.save(function (err) {
     if (err) res.status(500).send(err);
     res.status(201).send();
   });
 }
 
-export function getUserList(req, res) {
+export function getStaffList(req, res) {
   const limit =
     req.query.limit && req.query.limit <= 100 ? parseInt(req.query.limit) : 10;
   const page = 0;
@@ -29,37 +29,37 @@ export function getUserList(req, res) {
       page = Number.isInteger(req.query.page) ? req.query.page : 0;
     }
   }
-  Users
+  Staff
     .find()
     .limit(limit)
     .skip(page)
-    .select("userName firstName lastName email profile age gender sns")
+    .select("staffName firstName lastName email")
     .exec(function (err, result) {
       if (err) res.status(500).send(err);
       res.status(200).send(result);
     })
 }
 
-export function login(req, res) {
+export function staffLogin(req, res) {
   try {
-    const refreshId = req.body.email + secret;
+    const refreshId = req.body.email + staffSecret;
     const salt = crypto.randomBytes(16).toString("base64");
     const hash = crypto
       .createHmac("sha512", salt)
       .update(refreshId)
       .digest("base64");
     req.body.refreshKey = salt;
-    const token = jsonwebtoken.sign(req.body, secret);
+    const token = jsonwebtoken.sign(req.body, staffSecret);
     const b = Buffer.from(hash);
     const refresh_token = b.toString("base64");
     req.session.token = `Bearer ${token}`;
-    res.status(200).send();
+      res.status(200).send({ refreshToken: refresh_token });
   } catch (err) {
     res.status(500).send({ errors: err });
   }
 }
 
-export function logout(req, res) {
+export function staffLogout(req, res) {
   if (req.session.token) {
     req.session.token = "";
     res.status(200).send();
@@ -68,11 +68,11 @@ export function logout(req, res) {
   }
 }
 
-export function getSelf(req, res) {
-  Users
-    .findOne({ "userName": req.jwt.userName })
+export function getStaffSelf(req, res) {
+  Staff
+    .findOne({ "staffName": req.jwt.staffName })
     .select(
-      "userName firstName lastName email profile age gender sns"
+      "userName firstName lastName email"
     )
     .exec(function (err, result) {
       if (err) res.status(500).send(err);
@@ -80,11 +80,11 @@ export function getSelf(req, res) {
     })
 }
 
-export function getByUserName(req, res) {
-  Users
-    .findOne({ "userName": req.params.userName })
+export function getByStaffName(req, res) {
+  Staff
+    .findOne({ "staffName": req.params.staffName })
     .select(
-      "userName firstName lastName email profile age gender sns"
+      "userName firstName lastName email"
     )
     .exec(function (err, result) {
       if (err) res.status(500).send(err);
@@ -92,7 +92,7 @@ export function getByUserName(req, res) {
     })
 }
 
-export function putByUserName(req, res) {
+export function putByStaffName(req, res) {
   if (req.body.password) {
     const salt = crypto.randomBytes(16).toString("base64");
     const hash = crypto
@@ -102,17 +102,17 @@ export function putByUserName(req, res) {
     req.body.password = salt + "$" + hash;
   }
 
-  Users
-    .findOneAndUpdate({ "userName": req.jwt.userName }, req.body)
+  Staff
+    .findOneAndUpdate({ "staffName": req.jwt.staffName }, req.body)
     .exec(function (err, result) {
       if (err) res.status(500).send(err);
       res.status(200).send(result);
     })
 }
 
-export function removeByUserName(req, res) {
-  Users
-    .deleteOne({ "userName": userName })
+export function removeByStaffName(req, res) {
+  Staff
+    .deleteOne({ "staffName": staffName })
     .exec(function (err, result) {
       if (err) res.status(500).send(err);
       req.session.token = "";

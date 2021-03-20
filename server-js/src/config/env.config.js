@@ -3,6 +3,7 @@ export default {
   appEndpoint: "http://localhost:3600",
   apiEndpoint: "http://localhost:3000",
   jwt_secret: "sample",
+  jwt_staff_secret: "staffSample",
   jwt_expiration_in_seconds: 36000,
   environment: "dev",
   permissionLevels: {

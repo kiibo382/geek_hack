@@ -1,5 +1,4 @@
-import dotenv from "dotenv";
-dotenv.config();
+import dbConfig from "./db.config.js"
 import mongoose from "mongoose";
 
 const options = {
@@ -14,7 +13,7 @@ const connectWithRetry = () => {
   console.log("MongoDB connection with retry");
   mongoose
     .connect(
-      `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
+      `mongodb://${dbConfig.DB_USER}:${dbConfig.DB_PASS}@${dbConfig.HOST}:${dbConfig.DB_PORT}/${dbConfig.DB_NAME}`,
       options
     )
     .then(() => {

@@ -1,16 +1,6 @@
-import {
-  createGroup,
-  groupList,
-  findByGroupName,
-  putGroup,
-  removeGroup,
-  getMembers,
-  addMember,
-  addApplicant,
-  removeMember,
-  getApplicants,
-  removeApplicant
-} from "../models/groups.js";
+import Users from "../models/users.js";
+import Groups from "../models/groups.js";
+import Staff from "../models/staff.js";
 import envConfig from "../config/env.config.js";
 const secret = envConfig.jwt_secret;
 import crypto from "crypto";
@@ -24,19 +14,20 @@ export function registerGroup(req, res) {
       .digest("base64");
     req.body.password = salt + "$" + hash;
   }
-  try {
-    createGroup(req.body)
-  } catch (err) {
-    res.status(500).send(err)
-  }
-  addMember(req.body.groupName, req.jwt.userName)
-    .then(() => {
-      res.status(201).send();
-    })
-    .catch((err) => {
-      console.log(err)
-      res.status(500).send(err)
-    })
+  const group = new Groups(req.body);
+  group.save(function (err) {
+    if (err) res.status(500).send(err);
+    Staff.findOne({ "staffName": req.jwt.staffName })
+      .exec(function (err, staff) {
+        if (err) res.status(500).send(err);
+        Groups.updateOne({ "groupName": req.body.groupName }, { $push: { "staff": staff._id } })
+          .exec(function (err, result) {
+            if (err) res.status(500).send(err);
+            res.status(201).send(result);
+          })
+      })
+    res.status(201).send();
+  });
 };
 
 export function getGroupList(req, res) {
@@ -49,26 +40,23 @@ export function getGroupList(req, res) {
       page = Number.isInteger(req.query.page) ? req.query.page : 0;
     }
   }
-  groupList(limit, page)
-    .then((result) => {
+  Groups.find()
+    .limit(perPage)
+    .skip(perPage * page)
+    .select("groupName emailDomain urls intern newCareer midCareer industry profile members")
+    .exec(function (err, result) {
+      if (err) res.status(500).send(err);
       res.status(200).send(result);
-    })
-    .catch((e) => {
-      res.status(500).send(e)
     })
 }
 
 export function getByGroupName(req, res) {
-  findByGroupName(req.params.groupName)
-    .then((result) => {
-      if (result) {
-        res.status(200).send(result);
-      } else {
-        res.status(404).send(result);
-      }
-    })
-    .catch((e) => {
-      res.status(500).send(e)
+  Groups
+    .findOne({ "groupName": req.params.groupName })
+    .select("groupName emailDomain urls intern newCareer midCareer industry profile members")
+    .exec(function (err, result) {
+      if (err) res.status(500).send(err);
+      res.status(200).send(result);
     })
 }
 
@@ -81,86 +69,171 @@ export function putByGroupName(req, res) {
       .digest("base64");
     req.body.password = salt + "$" + hash;
   }
-
-  putGroup(req.params.groupName, req.body).then((result) => {
-    res.status(204).send({});
-  });
+  Groups
+    .findOneAndUpdate({ "groupName": groupName }, groupData)
+    .exec(function (err, result) {
+      if (err) res.status(500).send(err);
+      res.status(200).send(result);
+    })
 }
 
 export function removeByGroupName(req, res) {
-  removeGroup(req.params.groupName)
-    .then((result) => {
+  Groups
+    .deleteOne({ "groupName": req.params.groupName })
+    .exec(function (err, result) {
+      if (err) res.status(500).send(err);
       res.status(204).send(result);
     })
-    .catch((e) => {
-      res.status(500).send(e)
+}
+
+export function getStaffByGroupName(req, res) {
+  Groups
+    .findOne({ "groupName": req.params.groupName })
+    .populate("staff")
+    .exec(function (err, result) {
+      if (err) res.status(500).send(err);
+      res.status(200).send(result);
     })
 }
 
-export function getMembersByGroupName(req, res) {
-  getMembers(req.params.groupName)
-    .then((result) => {
-      if (result) {
-        res.status(200).send(result);
-      } else {
-        res.status(404).send(result);
-      }
-    })
-    .catch((e) => {
-      res.status(500).send(e)
-    })
-}
-
-export function getApplicantsByGroupName(req, res) {
-  getApplicants(req.params.groupName)
-    .then((result) => {
-      if (result) {
-        res.status(200).send(result);
-      } else {
-        res.status(404).send(result);
-      }
-    })
-    .catch((e) => {
-      res.status(500).send({ errors: err });
+export function addStaffByGroupName(req, res) {
+  Staff
+    .findOne({ "staffName": req.body.staffName })
+    .exec(function (err, staff) {
+      if (err) res.status(500).send(err);
+      Groups
+        .updateOne({ "groupName": req.params.groupName }, { $push: { "staff": staff._id } })
+        .exec(function (err, result) {
+          if (err) res.status(500).send(err);
+          res.status(200).send(result);
+        })
     })
 }
 
-export function addMemberByGroupName(req, res) {
-  addMember(req.params.groupName, req.body.userName)
-    .then(() => {
-      res.status(204).send();
-    })
-    .catch((err) => {
-      res.status(500).send(err)
-    })
-}
-
-export function removeMemberByGroupName(req, res) {
-  removeMember(req.params.groupName, req.body.userName)
-    .then(() => {
-      res.status(204).send();
-    })
-    .catch((err) => {
-      res.status(500).send(err)
+export function removeStaffByGroupName(req, res) {
+  Staff
+    .findOne({ "staffName": req.body.staffName })
+    .exec(function (err, staff) {
+      if (err) res.status(500).send(err);
+      Groups
+        .updateOne({ "groupName": req.params.groupName }, { $pop: { "staff": staff._id } })
+        .exec(function (err, result) {
+          if (err) res.status(500).send(err);
+          res.status(200).send(result);
+        })
     })
 }
 
-export function addApplicantByGroupName(req, res) {
-  addApplicant(req.params.groupName, req.body.userName)
-    .then(() => {
-      res.status(204).send();
-    })
-    .catch((err) => {
-      res.status(500).send(err)
+export function getStaffApplicantByGroupName(req, res) {
+  Groups
+    .findOne({ "groupName": req.params.groupName })
+    .populate("staffApplicant")
+    .exec(function (err, result) {
+      if (err) res.status(500).send(err);
+      res.status(200).send(result);
     })
 }
 
-export function removeApplicantByGroupName(req, res) {
-  removeApplicant(req.params.groupName, req.body.userName)
-    .then(() => {
-      res.status(204).send();
+export function addStaffApplicantByGroupName(req, res) {
+  Staff
+    .findOne({ "staffName": req.body.staffName })
+    .exec(function (err, staff) {
+      if (err) res.status(500).send(err);
+      Groups
+        .updateOne({ "groupName": req.params.groupName }, { $push: { "staffApplicant": staff._id } })
+        .exec(function (err, result) {
+          if (err) res.status(500).send(err);
+          res.status(200).send(result);
+        })
     })
-    .catch((err) => {
-      res.status(500).send(err)
+}
+
+export function removeStaffApplicantByGroupName(req, res) {
+  Staff
+    .findOne({ "staffName": req.body.staffName })
+    .exec(function (err, staff) {
+      if (err) res.status(500).send(err);
+      Groups
+        .updateOne({ "groupName": req.params.groupName }, { $pop: { "staffApplicant": staff._id } })
+        .exec(function (err, result) {
+          if (err) res.status(500).send(err);
+          res.status(200).send(result);
+        })
+    })
+}
+
+export function getAmbassadorByGroupName(req, res) {
+  Groups
+    .findOne({ "groupName": req.params.groupName })
+    .populate("ambassador")
+    .exec(function (err, result) {
+      if (err) res.status(500).send(err);
+      res.status(200).send(result);
+    })
+}
+
+export function addAmbassadorByGroupName(req, res) {
+  Users
+    .findOne({ "userName": req.body.userName })
+    .exec(function (err, user) {
+      if (err) res.status(500).send(err);
+      Groups
+        .updateOne({ "groupName": req.params.groupName }, { $push: { "ambassador": user._id } })
+        .exec(function (err, result) {
+          if (err) res.status(500).send(err);
+          res.status(200).send(result);
+        })
+    })
+}
+
+export function removeAmbassadorByGroupName(req, res) {
+  Users
+    .findOne({ "userName": req.body.userName })
+    .exec(function (err, user) {
+      if (err) res.status(500).send(err);
+      Groups
+        .updateOne({ "groupName": req.params.groupName }, { $pop: { "ambassador": user._id } })
+        .exec(function (err, result) {
+          if (err) res.status(500).send(err);
+          res.status(200).send(result);
+        })
+    })
+}
+
+export function getAmbassadorApplicantByGroupName(req, res) {
+  Groups
+    .findOne({ "groupName": req.params.groupName })
+    .populate("ambassadorApplicant")
+    .exec(function (err, result) {
+      if (err) res.status(500).send(err);
+      res.status(200).send(result);
+    })
+}
+
+export function addAmbassadorApplicantByGroupName(req, res) {
+  Users
+    .findOne({ "userName": req.body.userName })
+    .exec(function (err, user) {
+      if (err) res.status(500).send(err);
+      Groups
+        .updateOne({ "groupName": req.params.groupName }, { $push: { "ambassadorApplicant": user._id } })
+        .exec(function (err, result) {
+          if (err) res.status(500).send(err);
+          res.status(200).send(result);
+        })
+    })
+}
+
+export function removeAmbassadorApplicantByGroupName(req, res) {
+  Users
+    .findOne({ "userName": req.body.userName })
+    .exec(function (err, user) {
+      if (err) res.status(500).send(err);
+      Groups
+        .updateOne({ "groupName": req.params.groupName }, { $pop: { "ambassadorApplicant": user._id } })
+        .exec(function (err, result) {
+          if (err) res.status(500).send(err);
+          res.status(200).send(result);
+        })
     })
 }

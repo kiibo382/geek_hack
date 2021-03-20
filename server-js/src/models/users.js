@@ -58,7 +58,7 @@ export function findByEmail(email) {
 }
 
 export function findByUserName(userName) {
-  Users.findOne({ "userName": userName })
+  return Users.findOne({ "userName": userName })
     .select(
       "userName firstName lastName email profile age gender sns"
     )
@@ -70,7 +70,7 @@ export function createUser(userData) {
 }
 
 export function userList(perPage, page) {
-  Users.find()
+  return Users.find()
     .limit(perPage)
     .skip(perPage * page)
     .select("userName firstName lastName email profile age gender sns")

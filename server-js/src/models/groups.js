@@ -1,5 +1,4 @@
 import mongoose from "../config/mongoose.js";
-import { findByUserName } from "./users.js"
 
 const Schema = mongoose.Schema;
 
@@ -10,39 +9,6 @@ const urlsSchema = new Schema({
         required: true
     }
 })
-
-const staffSchema = new Schema({
-    staffName: {
-        type: String,
-        unique: true,
-        required: true,
-    },
-    firstName: {
-        type: String,
-        required: true,
-    },
-    lastName: {
-        type: String,
-        required: true,
-    },
-    email: {
-        type: String,
-        unique: true,
-        required: true,
-        validate: {
-            validator: (v) => validator.isEmail(v),
-            message: (props) => `${props.value} is invalid email address`,
-        },
-    },
-    password: {
-        type: String,
-        required: true,
-    },
-    permissionLevel: {
-        type: Number,
-        default: 1,
-    },
-});
 
 const groupsSchema = new Schema({
     groupName: {
@@ -57,14 +23,16 @@ const groupsSchema = new Schema({
     password: String,
     urls: [urlsSchema],
     profile: String,
-    staff: [staffSchema],
-    ambassador: [{ type: Schema.Types.ObjectId, ref: 'Users' }]
+    staff: [{ type: Schema.Types.ObjectId, ref: 'Staff' }],
+    staffApplicant: [{ type: Schema.Types.ObjectId, ref: 'Staff' }],
+    ambassador: [{ type: Schema.Types.ObjectId, ref: 'Users' }],
+    ambassadorApplicant: [{ type: Schema.Types.ObjectId, ref: 'Users' }]
 });
 
 const Groups = mongoose.model("Groups", groupsSchema);
 
 export function findByGroupName(groupName) {
-    Groups.findOne({ "groupName": groupName })
+    return Groups.findOne({ "groupName": groupName })
         .select("groupName emailDomain urls intern newCareer midCareer industry profile members")
 }
 
@@ -74,7 +42,7 @@ export function createGroup(groupData) {
 }
 
 export function groupList(perPage, page) {
-    Groups.find()
+    return Groups.find()
         .limit(perPage)
         .skip(perPage * page)
         .select("groupName emailDomain urls intern newCareer midCareer industry profile members")
@@ -93,17 +61,17 @@ export async function removeGroup(groupName) {
 }
 
 export function getMembers(groupName) {
-    Groups.findOne({ "groupName": groupName })
+    return Groups.findOne({ "groupName": groupName })
         .populate("members")
 }
 
 export function getMemberIds(groupName) {
-    Groups.findOne({ "groupName": groupName })
+    return Groups.findOne({ "groupName": groupName })
         .select("members")
 }
 
 export function getApplicants(groupName) {
-    Groups.findOne({ "groupName": groupName })
+    return Groups.findOne({ "groupName": groupName })
         .populate("applicants")
 }
 
@@ -147,3 +115,5 @@ export function removeApplicant(groupName, userName) {
             return err
         })
 }
+
+export default Groups
