@@ -1,0 +1,35 @@
+/groups
+    /   GET
+        POST
+    /:groupName GET
+                PUT
+                DELETE
+    /:groupName/members GET
+                        POST（jsonでgroupName、userNameを送る）
+                        DELETE（jsonでgroupName、userNameを送る）
+    /:groupName/applicants  GET
+                            POST（jsonでgroupName、userNameを送る）
+                            DELETE（jsonでgroupName、userNameを送る）
+    /:groupName/chat
+/users
+    /groups GET
+
+
+loginしてないとgroupsにはアクセスできない。
+
+GET /
+POST /
+GET /:goupName
+GET /:goupName/members
+POST /:groupName/applicants
+以外はreq.jwt.userNameがmembersに含まれているかcheck
+
+applicant はmembersに参加キャンセル申請を出せる。
+
+POST /members が成功したら自動でapplicantsから削除
+
+/:groupName/chat では、membersにあればmemberと画面に表示、membersになければnon-memberと表示。
+
+
+
+招待されないとそのエンジニアコミュニティに入れない制度にするか。（検索はできる。入りたければSNSで探したりする。一人一つまでなら作ることが出来る。）
