@@ -18,9 +18,13 @@ export function insertUser(req, res) {
     .digest("base64");
   req.body.password = salt + "$" + hash;
   req.body.permissionLevel = 1;
-  createUser(req.body).then(() => {
-    res.status(201).send();
-  });
+  createUser(req.body)
+    .then(() => {
+      res.status(201).send();
+    })
+    .catch((e) => {
+      res.status(500).send(e)
+    })
 }
 
 export function getUserList(req, res) {
@@ -33,9 +37,13 @@ export function getUserList(req, res) {
       page = Number.isInteger(req.query.page) ? req.query.page : 0;
     }
   }
-  userList(limit, page).then((result) => {
-    res.status(200).send(result);
-  });
+  userList(limit, page)
+    .then((result) => {
+      res.status(200).send(result);
+    })
+    .catch((e) => {
+      res.status(500).send(e)
+    })
 }
 
 export function login(req, res) {
@@ -67,31 +75,31 @@ export function logout(req, res) {
 }
 
 export function getSelf(req, res) {
-  try {
-    findByUserName(req.jwt.userName).then((result) => {
+  findByUserName(req.jwt.userName)
+    .then((result) => {
       if (result) {
         res.status(200).send(result);
       } else {
         res.status(404).send(result);
       }
-    });
-  } catch (err) {
-    res.status(500).send({ errors: err });
-  }
+    })
+    .catch((e) => {
+      res.status(500).send(e)
+    })
 }
 
 export function getByUserName(req, res) {
-  try {
-    findByUserName(req.params.userName).then((result) => {
+  findByUserName(req.params.userName)
+    .then((result) => {
       if (result) {
         res.status(200).send(result);
       } else {
         res.status(404).send(result);
       }
-    });
-  } catch (err) {
-    res.status(500).send({ errors: err });
-  }
+    })
+    .catch((e) => {
+      res.status(500).send(e)
+    })
 }
 
 export function putByUserName(req, res) {
@@ -104,9 +112,13 @@ export function putByUserName(req, res) {
     req.body.password = salt + "$" + hash;
   }
 
-  putUser(req.jwt.userName, req.body).then(() => {
-    res.status(204).send();
-  });
+  putUser(req.jwt.userName, req.body)
+    .then(() => {
+      res.status(204).send();
+    })
+    .catch((e) => {
+      res.status(500).send(e)
+    })
 }
 
 export function removeByUserName(req, res) {

@@ -1,27 +1,23 @@
 {
-  "name": "casumee-server",
+  "name": "geekhack-server-js",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "start-dev": "NODE_ENV=development DEBUG=casumee-server:* nodemon ./bin/server.js",
-    "start-stg": "node ./bin/server.js",
-    "start-prd": "forever ./bin/server.js",
-    "format": "prettier --write './**/*.js'"
+    "start-dev": "NODE_ENV=development DEBUG=casumee-server:* nodemon ./src/bin/server.js",
+    "start-stg": "node ./src/bin/server.js",
+    "start-prd": "forever ./src/bin/server.js",
+    "format": "prettier --write './src/**/*.js'"
   },
   "dependencies": {
-    "bcrypt": "^5.0.1",
     "connect-redis": "^5.1.0",
     "cookie-parser": "^1.4.5",
-    "debug": "^4.3.1",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
-    "http-errors": "^1.8.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.11.19",
-    "mongoose-auto-increment": "^5.0.1",
     "morgan": "^1.10.0",
     "path": "^0.12.7",
     "redis": "^3.0.2",

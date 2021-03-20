@@ -11,58 +11,61 @@ const urlsSchema = new Schema({
     }
 })
 
+const staffSchema = new Schema({
+    staffName: {
+        type: String,
+        unique: true,
+        required: true,
+    },
+    firstName: {
+        type: String,
+        required: true,
+    },
+    lastName: {
+        type: String,
+        required: true,
+    },
+    email: {
+        type: String,
+        unique: true,
+        required: true,
+        validate: {
+            validator: (v) => validator.isEmail(v),
+            message: (props) => `${props.value} is invalid email address`,
+        },
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+    permissionLevel: {
+        type: Number,
+        default: 1,
+    },
+});
+
 const groupsSchema = new Schema({
     groupName: {
         type: String,
         unique: true,
         required: true,
     },
-    emailDomain: {
+    email: {
         type: String,
         unique: true
     },
     password: String,
     urls: [urlsSchema],
-    intern: {
-        type: Boolean,
-        default: false
-    },
-    newCareer: {
-        type: Boolean,
-        default: false
-    },
-    midCareer: {
-        type: Boolean,
-        default: false
-    },
-    industry: String,
     profile: String,
-    members: [{ type: Schema.Types.ObjectId, ref: 'Users' }],
-    applicants: [{ type: Schema.Types.ObjectId, ref: 'Users' }]
+    staff: [staffSchema],
+    ambassador: [{ type: Schema.Types.ObjectId, ref: 'Users' }]
 });
 
 const Groups = mongoose.model("Groups", groupsSchema);
 
 export function findByGroupName(groupName) {
-    return new Promise((resolve, reject) => {
-        Groups.findOne({ "groupName": groupName })
-            .select("groupName emailDomain urls intern newCareer midCareer industry profile members")
-            .exec(function (err, group) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(group);
-                }
-            });
-    })
-        .then((result) => {
-            result = result.toJSON();
-            delete result._id;
-            return result
-        })
-        .catch(() => {
-            return null
-        })
+    Groups.findOne({ "groupName": groupName })
+        .select("groupName emailDomain urls intern newCareer midCareer industry profile members")
 }
 
 export function createGroup(groupData) {
@@ -71,19 +74,10 @@ export function createGroup(groupData) {
 }
 
 export function groupList(perPage, page) {
-    return new Promise((resolve, reject) => {
-        Groups.find()
-            .limit(perPage)
-            .skip(perPage * page)
-            .select("groupName emailDomain urls intern newCareer midCareer industry profile members")
-            .exec(function (err, users) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(users);
-                }
-            });
-    })
+    Groups.find()
+        .limit(perPage)
+        .skip(perPage * page)
+        .select("groupName emailDomain urls intern newCareer midCareer industry profile members")
 }
 
 export function putGroup(groupName, groupData) {
@@ -99,49 +93,22 @@ export async function removeGroup(groupName) {
 }
 
 export function getMembers(groupName) {
-    return new Promise((resolve, reject) => {
-        Groups.findOne({ "groupName": groupName })
-            .populate("members")
-            .exec((err, result) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(result.members);
-                }
-            });
-    })
+    Groups.findOne({ "groupName": groupName })
+        .populate("members")
 }
 
 export function getMemberIds(groupName) {
-    return new Promise((resolve, reject) => {
-        Groups.findOne({ "groupName": groupName })
-            .select("members")
-            .exec((err, result) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(result);
-                }
-            });
-    })
+    Groups.findOne({ "groupName": groupName })
+        .select("members")
 }
 
 export function getApplicants(groupName) {
-    return new Promise((resolve, reject) => {
-        Groups.findOne({ "groupName": groupName })
-            .populate("applicants")
-            .exec((err, result) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(result.applicants);
-                }
-            });
-    })
+    Groups.findOne({ "groupName": groupName })
+        .populate("applicants")
 }
 
 export function addMember(groupName, userName) {
-    return findByUserName(userName)
+    findByUserName(userName)
         .then((user) => {
             return Groups.updateOne({ "groupName": groupName }, { $push: { "members": user._id } });
         })
@@ -151,7 +118,7 @@ export function addMember(groupName, userName) {
 }
 
 export function removeMember(groupName, userName) {
-    return findByUserName(userName)
+    findByUserName(userName)
         .then((user) => {
             return Groups.updateOne({ "groupName": groupName }, { $pop: { "members": user._id } });
         })
@@ -162,7 +129,7 @@ export function removeMember(groupName, userName) {
 
 export function addApplicant(groupName, userName) {
     console.log(groupName)
-    return findByUserName(userName)
+    findByUserName(userName)
         .then((user) => {
             return Groups.updateOne({ "groupName": groupName }, { $push: { "applicants": user._id } });
         })
@@ -172,7 +139,7 @@ export function addApplicant(groupName, userName) {
 }
 
 export function removeApplicant(groupName, userName) {
-    return findByUserName(userName)
+    findByUserName(userName)
         .then((user) => {
             return Groups.updateOne({ "groupName": groupName }, { $pop: { "applicants": user._id } });
         })

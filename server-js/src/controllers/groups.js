@@ -49,23 +49,27 @@ export function getGroupList(req, res) {
       page = Number.isInteger(req.query.page) ? req.query.page : 0;
     }
   }
-  groupList(limit, page).then((result) => {
-    res.status(200).send(result);
-  });
+  groupList(limit, page)
+    .then((result) => {
+      res.status(200).send(result);
+    })
+    .catch((e) => {
+      res.status(500).send(e)
+    })
 }
 
 export function getByGroupName(req, res) {
-  try {
-    findByGroupName(req.params.groupName).then((result) => {
+  findByGroupName(req.params.groupName)
+    .then((result) => {
       if (result) {
         res.status(200).send(result);
       } else {
         res.status(404).send(result);
       }
-    });
-  } catch (err) {
-    res.status(500).send({ errors: err });
-  }
+    })
+    .catch((e) => {
+      res.status(500).send(e)
+    })
 }
 
 export function putByGroupName(req, res) {
@@ -84,37 +88,41 @@ export function putByGroupName(req, res) {
 }
 
 export function removeByGroupName(req, res) {
-  removeGroup(req.params.groupName).then((result) => {
-    res.status(204).send(result);
-  });
+  removeGroup(req.params.groupName)
+    .then((result) => {
+      res.status(204).send(result);
+    })
+    .catch((e) => {
+      res.status(500).send(e)
+    })
 }
 
 export function getMembersByGroupName(req, res) {
-  try {
-    getMembers(req.params.groupName).then((result) => {
+  getMembers(req.params.groupName)
+    .then((result) => {
       if (result) {
         res.status(200).send(result);
       } else {
         res.status(404).send(result);
       }
-    });
-  } catch (err) {
-    res.status(500).send({ errors: err });
-  }
+    })
+    .catch((e) => {
+      res.status(500).send(e)
+    })
 }
 
 export function getApplicantsByGroupName(req, res) {
-  try {
-    getApplicants(req.params.groupName).then((result) => {
+  getApplicants(req.params.groupName)
+    .then((result) => {
       if (result) {
         res.status(200).send(result);
       } else {
         res.status(404).send(result);
       }
-    });
-  } catch (err) {
-    res.status(500).send({ errors: err });
-  }
+    })
+    .catch((e) => {
+      res.status(500).send({ errors: err });
+    })
 }
 
 export function addMemberByGroupName(req, res) {
