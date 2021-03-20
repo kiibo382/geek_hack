@@ -2,8 +2,6 @@ import jwt from "jsonwebtoken";
 import envConfig from "../../config/env.config.js";
 const secret = envConfig.jwt_secret;
 import crypto from "crypto";
-import pkg from "morgan";
-const { token } = pkg;
 
 export function verifyRefreshBodyField(req, res, next) {
   if (req.body && req.body.refresh_token) {

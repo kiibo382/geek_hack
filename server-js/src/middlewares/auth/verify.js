@@ -27,7 +27,7 @@ export function hasAuthValidFields(req, res, next) {
 
 export function isPasswordAndUserMatch(req, res, next) {
   Users
-    .findOne({ "userName": req.jwt.userName })
+    .findOne({ "email": req.body.email })
     .exec(function (err, user) {
       if (err) res.status(500).send(err);
       if (!user) {
@@ -59,7 +59,7 @@ export function isPasswordAndUserMatch(req, res, next) {
 
 export function isPasswordAndStaffMatch(req, res, next) {
   Staff
-    .findOne({ "staffName": req.jwt.staffName })
+    .findOne({ "email": req.body.email })
     .exec(function (err, staff) {
       if (err) res.status(500).send(err);
       if (!staff) {
@@ -73,8 +73,8 @@ export function isPasswordAndStaffMatch(req, res, next) {
           .digest("base64");
         if (hash === passwordFields[1]) {
           req.body = {
-            userId: staff._id,
-            userName: staff.userName,
+            staffId: staff._id,
+            staffName: staff.staffName,
             email: staff.email,
             permissionLevel: staff.permissionLevel,
             provider: "email",
