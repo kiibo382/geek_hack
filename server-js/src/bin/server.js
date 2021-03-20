@@ -1,21 +1,22 @@
-#!/usr/bin/env node
-
 import app from "../app.js";
-import httpModule from "http";
-// import { Server } from "socket.io";
+import http from "http";
+import { Server } from "socket.io";
 
 const port = 3000;
-app.set("port", port);
 
-const server = httpModule.createServer(app);
-// const io = new Server(server);
+const httpServer = http.createServer(app);
 
-// io.on("connection", (socket) => {
-//   console.log("user connected");
+const io = new Server(httpServer);
 
-//   socket.on("group-post", (msg) => {
-//     socket.emit("group-member-post", msg);
-//   });
-// });
+httpServer.listen(port, () => {
+    console.log(`listening on *:${PORT}`)
+})
 
-server.listen(port);
+io.on("connection", (socket) => {
+    console.log("user connected");
+
+    socket.on("group-post", (msg) => {
+        socket.emit("group-member-post", msg);
+    });
+});
+
