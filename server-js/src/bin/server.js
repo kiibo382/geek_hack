@@ -2,21 +2,41 @@ import app from "../app.js";
 import http from "http";
 import { Server } from "socket.io";
 
-const port = 3000;
+const port = 8080;
 
 const httpServer = http.createServer(app);
 
-const io = new Server(httpServer);
+const io = new Server(httpServer, {
+    cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST"],
+        credentials: true,
+    },
+});
 
-httpServer.listen(port, () => {
-    console.log(`listening on *:${PORT}`)
-})
+const NEW_CHAT_MESSAGE_EVENT = "NEW_CHAT_MESSAGE_EVENT";
 
 io.on("connection", (socket) => {
-    console.log("user connected");
+    console.log(`${socket.id} connected`);
 
-    socket.on("group-post", (msg) => {
-        socket.emit("group-member-post", msg);
+    // Join a conversation
+    const { roomId } = socket.handshake.query;
+    socket.join(roomId);
+
+    // Listen for new messages
+    socket.on(NEW_CHAT_MESSAGE_EVENT, (data) => {
+        io.in(roomId).emit(NEW_CHAT_MESSAGE_EVENT, data);
+    });
+
+    // Leave the room if the user closes the socket
+    socket.on("disconnect", () => {
+        socket.leave(roomId);
     });
 });
+
+
+
+httpServer.listen(port, () => {
+    console.log(`listening on *:${port}`)
+})
 

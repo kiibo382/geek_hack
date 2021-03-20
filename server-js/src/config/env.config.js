@@ -1,7 +1,7 @@
 export default {
-  port: 3600,
-  appEndpoint: "http://localhost:3600",
-  apiEndpoint: "http://localhost:3000",
+  port: 8080,
+  appEndpoint: "http://localhost:3000",
+  apiEndpoint: "http://localhost:8080",
   jwt_secret: "sample",
   jwt_staff_secret: "staffSample",
   jwt_expiration_in_seconds: 36000,

@@ -48,9 +48,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(serverDir + "public")));
 
-app.use("/users", usersRouter);
-app.use("/staff", staffRouter);
-app.use("/auth", authRouter);
-app.use("/groups", groupsRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/staff", staffRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/groups", groupsRouter);
 
 export default app;
