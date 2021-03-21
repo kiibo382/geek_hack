@@ -8,33 +8,68 @@ const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
     cors: {
-        origin: "http://localhost:3000",
-        methods: ["GET", "POST"],
-        credentials: true,
+        origin: "http://localhost:3000"
     },
 });
 
-const NEW_CHAT_MESSAGE_EVENT = "NEW_CHAT_MESSAGE_EVENT";
+const STATIC_CHANNELS = [{
+    name: 'Global chat',
+    participants: 0,
+    id: 1,
+    sockets: []
+}, {
+    name: 'Funny',
+    participants: 0,
+    id: 2,
+    sockets: []
+}];
 
-io.on("connection", (socket) => {
-    console.log(`${socket.id} connected`);
+io.on('connection', (socket) => {
+    console.log('new client connected');
+    socket.emit('connection', null);
+    socket.on('channel-join', id => {
+        console.log('channel join', id);
+        STATIC_CHANNELS.forEach(c => {
+            if (c.id === id) {
+                if (c.sockets.indexOf(socket.id) == (-1)) {
+                    c.sockets.push(socket.id);
+                    c.participants++;
+                    io.emit('channel', c);
+                }
+            } else {
+                let index = c.sockets.indexOf(socket.id);
+                if (index != (-1)) {
+                    c.sockets.splice(index, 1);
+                    c.participants--;
+                    io.emit('channel', c);
+                }
+            }
+        });
 
-    // Join a conversation
-    const { roomId } = socket.handshake.query;
-    socket.join(roomId);
-
-    // Listen for new messages
-    socket.on(NEW_CHAT_MESSAGE_EVENT, (data) => {
-        io.in(roomId).emit(NEW_CHAT_MESSAGE_EVENT, data);
+        return id;
+    });
+    socket.on('send-message', message => {
+        io.emit('message', message);
     });
 
-    // Leave the room if the user closes the socket
-    socket.on("disconnect", () => {
-        socket.leave(roomId);
+    socket.on('disconnect', () => {
+        STATIC_CHANNELS.forEach(c => {
+            let index = c.sockets.indexOf(socket.id);
+            if (index != (-1)) {
+                c.sockets.splice(index, 1);
+                c.participants--;
+                io.emit('channel', c);
+            }
+        });
     });
+
 });
 
-
+app.get('/getChannels', (req, res) => {
+    res.json({
+        channels: STATIC_CHANNELS
+    })
+});
 
 httpServer.listen(port, () => {
     console.log(`listening on *:${port}`)

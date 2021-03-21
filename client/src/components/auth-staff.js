@@ -1,18 +1,18 @@
 import React, { Component } from "react";
 import StaffDataService from "../services/staff.service";
 
-export default class StaffLogin extends Component {
+export class StaffLogin extends Component {
     constructor(props) {
         super(props);
         this.onChangeEmail = this.onChangeEmail.bind(this);
         this.onChangePassword = this.onChangePassword.bind(this);
-        this.UsersLogin = this.UsersLogin.bind(this);
+        this.StaffLogin = this.StaffLogin.bind(this);
 
         this.state = {
             email: "",
             password: "",
 
-            loginSubmitted: false
+            slogin: false
         };
     }
 
@@ -28,19 +28,20 @@ export default class StaffLogin extends Component {
         });
     }
 
-    UsersLogin() {
+    StaffLogin() {
         var data = {
             email: this.state.email,
             password: this.state.password,
         };
 
-        StaffDataService.usersLogin(data)
+        StaffDataService.staffLogin(data)
             .then(response => {
+                localStorage.setItem("staff", response.data.email)
                 this.setState({
                     email: response.data.email,
                     password: response.data.password,
 
-                    loginSubmitted: true
+                    slogin: true
                 });
                 console.log(response.data);
             })
@@ -52,7 +53,7 @@ export default class StaffLogin extends Component {
     render() {
         return (
             <div className="submit-form">
-                {this.state.loginSubmitted ? (
+                {this.state.slogin ? (
                     <div>
                         <h4>You submitted successfully!</h4>
                         <a href="/">Go To Home Page.</a>
@@ -85,7 +86,7 @@ export default class StaffLogin extends Component {
                             />
                         </div>
 
-                        <button onClick={this.UsersLogin} className="btn btn-success">
+                        <button onClick={this.StaffLogin} className="btn btn-success">
                             Login
             </button>
                     </div>
@@ -95,7 +96,7 @@ export default class StaffLogin extends Component {
     }
 }
 
-export default class StaffLogout extends Component {
+export class StaffLogout extends Component {
     constructor(props) {
         super(props);
         this.UsersLogout = this.UsersLogout.bind(this);
@@ -106,7 +107,7 @@ export default class StaffLogout extends Component {
     }
 
     UsersLogout() {
-        StaffDataService.usersLogout()
+        StaffDataService.staffLogout()
             .then(response => {
                 this.setState({
                     LogoutSubmitted: true

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import UsersDataService from "../services/users.service";
 
-export default class UsersLogin extends Component {
+export class UsersLogin extends Component {
     constructor(props) {
         super(props);
         this.onChangeEmail = this.onChangeEmail.bind(this);
@@ -36,6 +36,7 @@ export default class UsersLogin extends Component {
 
         UsersDataService.usersLogin(data)
             .then(response => {
+                localStorage.setItem("user", response.data.email)
                 this.setState({
                     email: response.data.email,
                     password: response.data.password,
@@ -95,7 +96,7 @@ export default class UsersLogin extends Component {
     }
 }
 
-export default class UsersLogout extends Component {
+export class UsersLogout extends Component {
     constructor(props) {
         super(props);
         this.UsersLogout = this.UsersLogout.bind(this);

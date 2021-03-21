@@ -4,27 +4,27 @@ import StaffDataService from "../services/staff.service";
 export default class AddStaff extends Component {
     constructor(props) {
         super(props);
-        this.onChangeUserName = this.onChangeUserName.bind(this);
+        this.onChangeStaffName = this.onChangeStaffName.bind(this);
         this.onChangePassword = this.onChangePassword.bind(this);
         this.onChangeEmail = this.onChangeEmail.bind(this);
         this.onChangeFirstName = this.onChangeFirstName.bind(this);
         this.onChangeLastName = this.onChangeLastName.bind(this);
-        this.saveUsers = this.saveUsers.bind(this);
+        this.saveStaff = this.saveStaff.bind(this);
 
         this.state = {
-            userName: "",
+            staffName: "",
             password: "",
             email: "",
             firstName: "",
             lastName: "",
 
-            signupSubmitted: false
+            signup: false
         };
     }
 
-    onChangeUserName(e) {
+    onChangeStaffName(e) {
         this.setState({
-            userName: e.target.value
+            staffName: e.target.value
         });
     }
 
@@ -52,25 +52,25 @@ export default class AddStaff extends Component {
         });
     }
 
-    saveUsers() {
+    saveStaff() {
         var data = {
-            userName: this.state.userName,
+            staffName: this.state.staffName,
             password: this.state.password,
             email: this.state.email,
             firstName: this.state.firstName,
             lastName: this.state.lastName
         };
 
-        StaffDataService.usersSignup(data)
+        StaffDataService.staffSignup(data)
             .then(response => {
                 this.setState({
-                    userName: response.data.userName,
+                    staffName: response.data.staffName,
                     password: response.data.password,
                     email: response.data.email,
                     firstName: response.data.firstName,
                     lastName: response.data.lastName,
 
-                    signupSubmitted: true
+                    signup: true
                 });
             })
             .catch(e => {
@@ -81,7 +81,7 @@ export default class AddStaff extends Component {
     render() {
         return (
             <div className="submit-form">
-                {this.state.submitted ? (
+                {this.state.signup ? (
                     <div>
                         <h4>Your signup successed!</h4>
                         <a href="/staff/login">Go To Login Page.</a>
@@ -89,15 +89,15 @@ export default class AddStaff extends Component {
                 ) : (
                     <div>
                         <div className="form-group">
-                            <label htmlFor="userName">staffName</label>
+                            <label htmlFor="staffName">staffName</label>
                             <input
                                 type="text"
                                 className="form-control"
-                                id="userName"
+                                id="staffName"
                                 required
-                                value={this.state.userName}
-                                onChange={this.onChangeUserName}
-                                name="userName"
+                                value={this.state.staffName}
+                                onChange={this.onChangeStaffName}
+                                name="staffName"
                             />
                         </div>
 
@@ -153,9 +153,9 @@ export default class AddStaff extends Component {
                             />
                         </div>
 
-                        <button onClick={this.saveUsers} className="btn btn-success">
+                        <button onClick={this.saveStaff} className="btn btn-success">
                             Submit
-            </button>
+                        </button>
                     </div>
                 )}
             </div>
