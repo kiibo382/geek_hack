@@ -62,7 +62,6 @@ const StaffPrivateRoute = ({ ...props }) => {
   }
 }
 
-
 class App extends Component {
   render() {
     return (
@@ -93,17 +92,17 @@ class App extends Component {
               </Link>
             </li>
             <li className="nav-item">
-              <Link to={"/users/signup"} className="nav-link">
+              <Link to={"/staff/signup"} className="nav-link">
                 StaffSignup
               </Link>
             </li>
             <li className="nav-item">
-              <Link to={"/users/login"} className="nav-link">
+              <Link to={"/staff/login"} className="nav-link">
                 StaffLogin
               </Link>
             </li>
             <li className="nav-item">
-              <Link to={"/users/logout"} className="nav-link">
+              <Link to={"/staff/logout"} className="nav-link">
                 StaffLogout
               </Link>
             </li>
@@ -122,6 +121,12 @@ class App extends Component {
                 <UnAuthRoute exact path="/users/login" component={UsersLogin} />
                 <PrivateRoute exact path="/users/logout" component={UsersLogout} />
                 <PrivateRoute exact path="/users/self" component={UsersProfile} />
+                <UnAuthRoute exact path="/users" component={UsersList} />
+                <UnAuthRoute exact path="/staff/signup" component={AddUsers} />
+                <PrivateRoute exact path="/staff/:staffName" component={StaffProfile} />
+                <UnAuthRoute exact path="/staff/login" component={StaffLogin} />
+                <PrivateRoute exact path="/staff/logout" component={StaffLogout} />
+                <PrivateRoute exact path="/staff/self" component={StaffProfile} />
                 <Redirect to="/" />
               </Switch>
             </Router>
