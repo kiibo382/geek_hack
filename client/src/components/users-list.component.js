@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import TutorialDataService from "../services/tutorial.service";
+import UsersDataService from "../services/users.service";
 import { Link } from "react-router-dom";
 
-export default class TutorialsList extends Component {
+export default class UsersList extends Component {
   constructor(props) {
     super(props);
     this.onChangeSearchTitle = this.onChangeSearchTitle.bind(this);
@@ -33,7 +33,7 @@ export default class TutorialsList extends Component {
   }
 
   retrieveTutorials() {
-    TutorialDataService.getAll()
+    UsersDataService.usersList()
       .then(response => {
         this.setState({
           tutorials: response.data
@@ -61,7 +61,7 @@ export default class TutorialsList extends Component {
   }
 
   removeAllTutorials() {
-    TutorialDataService.deleteAll()
+    UsersDataService.deleteAll()
       .then(response => {
         console.log(response.data);
         this.refreshList();
@@ -77,7 +77,7 @@ export default class TutorialsList extends Component {
       currentIndex: -1
     });
 
-    TutorialDataService.findByTitle(this.state.searchTitle)
+    UsersDataService.findByTitle(this.state.searchTitle)
       .then(response => {
         this.setState({
           tutorials: response.data
@@ -173,7 +173,7 @@ export default class TutorialsList extends Component {
           ) : (
             <div>
               <br />
-              <p>Please click on a Tutorial...</p>
+              <p>Please click on a User...</p>
             </div>
           )}
         </div>

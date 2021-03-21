@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import TutorialDataService from "../services/tutorial.service";
+import UsersDataService from "../services/users.service";
 
-export default class Tutorial extends Component {
+export default class Users extends Component {
   constructor(props) {
     super(props);
     this.onChangeTitle = this.onChangeTitle.bind(this);
@@ -13,10 +13,11 @@ export default class Tutorial extends Component {
 
     this.state = {
       currentTutorial: {
-        id: null,
-        title: "",
-        description: "",
-        published: false
+        userName: "",
+        password: "",
+        email: "",
+        firstName: "",
+        lastName: "",
       },
       message: ""
     };
@@ -27,13 +28,13 @@ export default class Tutorial extends Component {
   }
 
   onChangeTitle(e) {
-    const title = e.target.value;
+    const userName = e.target.value;
 
     this.setState(function(prevState) {
       return {
         currentTutorial: {
           ...prevState.currentTutorial,
-          title: title
+          userName: userName
         }
       };
     });
@@ -51,7 +52,7 @@ export default class Tutorial extends Component {
   }
 
   getTutorial(id) {
-    TutorialDataService.get(id)
+    UsersDataService.usersGet(id)
       .then(response => {
         this.setState({
           currentTutorial: response.data
@@ -71,7 +72,7 @@ export default class Tutorial extends Component {
       published: status
     };
 
-    TutorialDataService.update(this.state.currentTutorial.id, data)
+    UsersDataService.usersUpdate(this.state.currentTutorial.id, data)
       .then(response => {
         this.setState(prevState => ({
           currentTutorial: {
@@ -87,7 +88,7 @@ export default class Tutorial extends Component {
   }
 
   updateTutorial() {
-    TutorialDataService.update(
+    UsersDataService.usersUpdate(
       this.state.currentTutorial.id,
       this.state.currentTutorial
     )
@@ -103,7 +104,7 @@ export default class Tutorial extends Component {
   }
 
   deleteTutorial() {    
-    TutorialDataService.delete(this.state.currentTutorial.id)
+    UsersDataService.usersDelete(this.state.currentTutorial.id)
       .then(response => {
         console.log(response.data);
         this.props.history.push('/tutorials')

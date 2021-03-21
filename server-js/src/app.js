@@ -5,6 +5,12 @@ import redis from "redis";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import cors from 'cors'
+import log4js from 'log4js';
+
+let logger = log4js.getLogger();
+logger.level = 'debug';
+logger.debug("My Debug message");
+
 
 import usersRouter from "./routes/users.js";
 import authRouter from "./routes/auth.js";
@@ -16,6 +22,7 @@ const redisClient = redis.createClient();
 
 const app = express();
 
+app.use(log4js.connectLogger(logger, { level: process.env.LOG_LEVEL || 'debug' }));
 app.use(cors())
 app.use(cookieParser());
 let sess = {
