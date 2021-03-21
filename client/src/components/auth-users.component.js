@@ -12,7 +12,7 @@ export default class UsersLogin extends Component {
             email: "",
             password: "",
 
-            submitted: false
+            loginSubmitted: false
         };
     }
 
@@ -40,7 +40,7 @@ export default class UsersLogin extends Component {
                     email: response.data.email,
                     password: response.data.password,
 
-                    submitted: true
+                    loginSubmitted: true
                 });
                 console.log(response.data);
             })
@@ -52,7 +52,76 @@ export default class UsersLogin extends Component {
     render() {
         return (
             <div className="submit-form">
-                {this.state.submitted ? (
+                {this.state.loginSubmitted ? (
+                    <div>
+                        <h4>You submitted successfully!</h4>
+                        <a href="/">Go To Home Page.</a>
+                    </div>
+                ) : (
+                    <div>
+                        <div className="form-group">
+                            <label htmlFor="email">email</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="email"
+                                required
+                                value={this.state.email}
+                                onChange={this.onChangeEmail}
+                                name="email"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="password">password</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="password"
+                                required
+                                value={this.state.password}
+                                onChange={this.onChangePassword}
+                                name="password"
+                            />
+                        </div>
+
+                        <button onClick={this.UsersLogin} className="btn btn-success">
+                            Login
+            </button>
+                    </div>
+                )}
+            </div>
+        );
+    }
+}
+
+export default class UsersLogout extends Component {
+    constructor(props) {
+        super(props);
+        this.UsersLogout = this.UsersLogout.bind(this);
+
+        this.state = {
+            logoutSubmitted: false
+        };
+    }
+
+    UsersLogout() {
+        UsersDataService.usersLogout()
+            .then(response => {
+                this.setState({
+                    LogoutSubmitted: true
+                });
+                console.log(response.data);
+            })
+            .catch(e => {
+                console.log(e);
+            });
+    }
+
+    render() {
+        return (
+            <div className="submit-form">
+                {this.state.logoutSubmitted ? (
                     <div>
                         <h4>You submitted successfully!</h4>
                         <a href="/">Go To Home Page.</a>

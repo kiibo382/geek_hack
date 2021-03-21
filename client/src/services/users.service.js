@@ -9,6 +9,10 @@ class UsersDataService {
     return http.post("/users/login", data);
   }
 
+  usersLogout(data) {
+    return http.post("/users/logout", data);
+  }
+
   usersList() {
     return http.get("/users");
   }

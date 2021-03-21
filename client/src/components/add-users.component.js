@@ -10,7 +10,6 @@ export default class AddUsers extends Component {
     this.onChangeFirstName = this.onChangeFirstName.bind(this);
     this.onChangeLastName = this.onChangeLastName.bind(this);
     this.saveUsers = this.saveUsers.bind(this);
-    this.newUsers = this.newUsers.bind(this);
 
     this.state = {
       userName: "",
@@ -19,7 +18,7 @@ export default class AddUsers extends Component {
       firstName: "",
       lastName: "",
 
-      submitted: false
+      signupSubmitted: false
     };
   }
 
@@ -71,7 +70,7 @@ export default class AddUsers extends Component {
           firstName: response.data.firstName,
           lastName: response.data.lastName,
 
-          submitted: true
+          signupSubmitted: true
         });
       })
       .catch(e => {

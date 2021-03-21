@@ -5,38 +5,62 @@ import "./App.css";
 
 import AddUsers from "./components/add-users.component";
 import UsersLogin from "./components/login-users.component";
-import Users from "./components/users.component";
+import Users from "./components/users";
 import UsersList from "./components/users-list.component";
-// import AuthUserProvider, { useAuthUser } from './AuthUserContext';
-// import LogoutPage from './LogoutPage';
-// import LoginPage from './LoginPage';
-// import HomePage from './HomePage';
-// import ProfilePage from './ProfilePage';
+import AuthUserProvider, { useAuthUser } from './AuthUserContext';
+import LogoutPage from './LogoutPage';
+import LoginPage from './LoginPage';
+import HomePage from './HomePage';
+import ProfilePage from './ProfilePage';
 
 
-// const UnAuthRoute = ({ ...props }) => {
-//   const authUser = useAuthUser()
-//   const isAuthenticated = authUser != null
-//   const { from } = useLocation().state
+const UnAuthRoute = ({ ...props }) => {
+  const authUser = useAuthUser()
+  const isAuthenticated = authUser != null
+  const { from } = useLocation().state
 
-//   if (isAuthenticated) {
-//     console.log(`ログイン済みのユーザーは${props.path}へはアクセスできません`)
-//     return <Redirect to={from ?? "/"} />
-//   } else {
-//     return <Route {...props} />
-//   }
-// }
+  if (isAuthenticated) {
+    console.log(`ログイン済みのユーザーは${props.path}へはアクセスできません`)
+    return <Redirect to={from ?? "/"} />
+  } else {
+    return <Route {...props} />
+  }
+}
 
-// const PrivateRoute = ({ ...props }) => {
-//   const authUser = useAuthUser()
-//   const isAuthenticated = authUser != null
-//   if (isAuthenticated) {
-//     return <Route {...props} />
-//   } else {
-//     console.log(`ログインしていないユーザーは${props.path}へはアクセスできません`)
-//     return <Redirect to={{ pathname: "/login", state: { from: props.location?.pathname } }} />
-//   }
-// }
+const PrivateRoute = ({ ...props }) => {
+  const authUser = useAuthUser()
+  const isAuthenticated = authUser != null
+  if (isAuthenticated) {
+    return <Route {...props} />
+  } else {
+    console.log(`ログインしていないユーザーは${props.path}へはアクセスできません`)
+    return <Redirect to={{ pathname: "/login", state: { from: props.location?.pathname } }} />
+  }
+}
+
+const StaffUnAuthRoute = ({ ...props }) => {
+  const authUser = useAuthUser()
+  const isAuthenticated = authUser != null
+  const { from } = useLocation().state
+
+  if (isAuthenticated) {
+    console.log(`ログイン済みのユーザーは${props.path}へはアクセスできません`)
+    return <Redirect to={from ?? "/"} />
+  } else {
+    return <Route {...props} />
+  }
+}
+
+const StaffPrivateRoute = ({ ...props }) => {
+  const authUser = useAuthUser()
+  const isAuthenticated = authUser != null
+  if (isAuthenticated) {
+    return <Route {...props} />
+  } else {
+    console.log(`ログインしていないユーザーは${props.path}へはアクセスできません`)
+    return <Redirect to={{ pathname: "/login", state: { from: props.location?.pathname } }} />
+  }
+}
 
 
 class App extends Component {
@@ -55,38 +79,53 @@ class App extends Component {
             </li>
             <li className="nav-item">
               <Link to={"/users/signup"} className="nav-link">
-                Signup
+                UsersSignup
               </Link>
             </li>
             <li className="nav-item">
               <Link to={"/users/login"} className="nav-link">
-                Login
+                UsersLogin
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to={"/users/logout"} className="nav-link">
+                UsersLogout
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to={"/users/signup"} className="nav-link">
+                StaffSignup
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to={"/users/login"} className="nav-link">
+                StaffLogin
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to={"/users/logout"} className="nav-link">
+                StaffLogout
               </Link>
             </li>
           </div>
         </nav>
 
-        {/* <div className="container mt-3">
-          <Link to={"/groups"} className="nav-link">
-            groups
-          </Link>
-        </div> */}
-
         <div className="container mt-3">
-              <Switch>
-                <Route exact path="/users" component={UsersList} />
-                <Route exact path="/users/signup" component={AddUsers} />
-                <Route exact path="/users/:userName" component={Users} />
-                {/* <PrivateRoute exact path="/" component={HomePage} />
-                <UnAuthRoute exact path="/users/login" component={LoginPage} />
-                <PrivateRoute exact path="/users/logout" component={LogoutPage} />
-                <PrivateRoute exact path="/profile/:userId" component={ProfilePage} />
-                <Redirect to="/" /> */}
-              </Switch>
-          {/* <AuthUserProvider>
+          <AuthUserProvider>
             <Router>
+              <Switch>
+                <PrivateRoute exact path="/" component={UsersPage} />
+                <StaffPrivateRoute exact path="/" component={StaffPage} />
+                <UnAuthRoute exact path="/users" component={UsersList} />
+                <UnAuthRoute exact path="/users/signup" component={AddUsers} />
+                <PrivateRoute exact path="/users/:userName" component={UsersProfile} />
+                <UnAuthRoute exact path="/users/login" component={UsersLogin} />
+                <PrivateRoute exact path="/users/logout" component={UsersLogout} />
+                <PrivateRoute exact path="/users/self" component={UsersProfile} />
+                <Redirect to="/" />
+              </Switch>
             </Router>
-          </AuthUserProvider> */}
+          </AuthUserProvider>
         </div>
       </div>
     );
