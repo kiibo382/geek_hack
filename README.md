@@ -1,6 +1,8 @@
 # Ambass
 ## About
 
+## important point
+ - server-tsは未完成なのでserver-jsからお願い致します。
 
 ## Requirement
  - node v14.4.0
