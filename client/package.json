@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^13.0.6",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
+    "material-dashboard-react": "^1.9.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-router-dom": "^5.2.0",
